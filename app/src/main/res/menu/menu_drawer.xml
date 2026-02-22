@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- TOP -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard"
+            android:title="Dashboard" />
+
+        <item
+            android:id="@+id/nav_paper_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="Paper Setting" />
+    </group>
+
+    <!-- CLASS MANAGEMENT (Expandable) -->
+    <item
+        android:id="@+id/nav_class_management"
+        android:icon="@drawable/ic_building"
+        android:title="Class Management">
+
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_students"
+                    android:icon="@drawable/ic_students"
+                    android:title="Students" />
+                <item
+                    android:id="@+id/nav_batch"
+                    android:icon="@drawable/ic_batch"
+                    android:title="Batch" />
+                <item
+                    android:id="@+id/nav_test"
+                    android:icon="@drawable/ic_test"
+                    android:title="Test" />
+                <item
+                    android:id="@+id/nav_attendance"
+                    android:icon="@drawable/ic_attendance"
+                    android:title="Attendance" />
+                <item
+                    android:id="@+id/nav_lecture"
+                    android:icon="@drawable/ic_lecture"
+                    android:title="Lecture" />
+                <item
+                    android:id="@+id/nav_fees"
+                    android:icon="@drawable/ic_fees"
+                    android:title="Fees" />
+            </group>
+        </menu>
+
+    </item>
+
+    <!-- TEST SERIES (Expandable) -->
+    <item
+        android:id="@+id/nav_test_series"
+        android:icon="@drawable/ic_series"
+        android:title="Test Series">
+
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_free_hand"
+                    android:icon="@drawable/ic_free_hand"
+                    android:title="Free Hand" />
+                <item
+                    android:id="@+id/nav_set_paper"
+                    android:icon="@drawable/ic_set_paper"
+                    android:title="Set Paper" />
+                <item
+                    android:id="@+id/nav_objective"
+                    android:icon="@drawable/ic_objective"
+                    android:title="Objective" />
+                <item
+                    android:id="@+id/nav_subjective"
+                    android:icon="@drawable/ic_subjective"
+                    android:title="Subjective" />
+                <item
+                    android:id="@+id/nav_add_question"
+                    android:icon="@drawable/ic_add_question"
+                    android:title="Add Question" />
+                <item
+                    android:id="@+id/nav_chat_ai"
+                    android:icon="@drawable/ic_chat"
+                    android:title="Chat to AI" />
+            </group>
+        </menu>
+
+    </item>
+
+    <!-- OPTIONAL (if you want like other screenshot) -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_user_list"
+            android:icon="@drawable/ic_user"
+            android:title="User List" />
+
+        <item
+            android:id="@+id/nav_transfer_data"
+            android:icon="@drawable/ic_transfer"
+            android:title="Transfer Data" />
+    </group>
+
+    <!-- LOGOUT -->
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Logout" />
+
+</menu>

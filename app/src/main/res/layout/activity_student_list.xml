@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
+    android:paddingTop="?attr/actionBarSize"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2">
+
+    <!-- Header Box -->
+    <LinearLayout
+        android:id="@+id/headerBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Page Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Student Info"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#111827"/>
+
+        <!-- Breadcrumb -->
+        <TextView
+            android:id="@+id/tvBreadcrumb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Dashboard  /  Class Management  /  Students"
+            android:textSize="12sp"
+            android:textColor="#6B7280"/>
+
+        <!-- top green line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="10dp"
+            android:background="#31B6A3"/>
+
+        <!-- Actions Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cbSelectAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select All Student"
+                android:textSize="12sp"
+                android:textColor="#374151"
+                android:layout_marginEnd="10dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Delete 0 Selected"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#E74C3C"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddNew"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:text="Add New Student"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#17B890"
+                app:icon="@drawable/ic_add"
+                app:iconTint="@android:color/white"
+                app:iconPadding="8dp"
+                app:iconGravity="textStart" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Table Container -->
+    <!-- Table Container -->
+    <LinearLayout
+        android:id="@+id/tableBox"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/headerBox"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Horizontal scroll for full table -->
+        <!-- Horizontal scroll for full table -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbars="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- Table Header Row (MATCHED WIDTHS) -->
+                <LinearLayout
+                    android:id="@+id/tableHeader"
+                    android:layout_width="900dp"
+                    android:layout_height="44dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#F3F4F6"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="55dp"
+                        android:layout_height="wrap_content"
+                        android:text="SR.NO"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:text="NAME"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="105dp"
+                        android:layout_height="wrap_content"
+                        android:text="BATCH"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="105dp"
+                        android:layout_height="wrap_content"
+                        android:text="BOARD"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="105dp"
+                        android:layout_height="wrap_content"
+                        android:text="MEDIUM"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="65dp"
+                        android:layout_height="wrap_content"
+                        android:text="CLASS"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:text="CREATED"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="97dp"
+                        android:layout_height="wrap_content"
+                        android:text="ACTION"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#111827"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="900dp"
+                    android:layout_height="1dp"
+                    android:background="#E5E7EB"/>
+
+                <!-- RecyclerView rows -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvStudents"
+                    android:layout_width="900dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:overScrollMode="never"/>
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
