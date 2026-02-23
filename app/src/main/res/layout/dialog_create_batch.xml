@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Title row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Create Batch"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#111827"/>
+
+        <TextView
+            android:id="@+id/btnClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:text="✕"
+            android:textSize="16sp"
+            android:textColor="#6B7280"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="#E5E7EB"/>
+
+    <!-- Row 1: Board + Medium -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Board"
+                android:textSize="12sp"
+                android:textColor="#374151"/>
+
+            <Spinner
+                android:id="@+id/spBoard"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"/>
+        </LinearLayout>
+
+        <View android:layout_width="12dp" android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Medium"
+                android:textSize="12sp"
+                android:textColor="#374151"/>
+
+            <Spinner
+                android:id="@+id/spMedium"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Row 2: Class + BatchName -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Class"
+                android:textSize="12sp"
+                android:textColor="#374151"/>
+
+            <Spinner
+                android:id="@+id/spClass"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"/>
+        </LinearLayout>
+
+        <View android:layout_width="12dp" android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Batch Name"
+                android:textSize="12sp"
+                android:textColor="#374151"/>
+
+            <EditText
+                android:id="@+id/etBatchName"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:hint="Batch Name"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:background="@android:drawable/edit_text"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:background="#E5E7EB"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDialogClose"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Close"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#6B7280"/>
+
+        <View android:layout_width="10dp" android:layout_height="1dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddBatch"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Add Batch"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#17B890"/>
+    </LinearLayout>
+
+</LinearLayout>

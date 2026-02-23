@@ -11,7 +11,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CoachingCenter_app">
-        <activity android:name=".UI.StudentListActivity" />
+        <activity
+            android:name=".UI.classManagement.CreateLecture"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.LectureList"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.CreateTest"
+            android:exported="false" />
+        <activity
+            android:name=".UI.TestList"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.BatchList"
+            android:exported="false" />
+        <activity android:name=".UI.classManagement.StudentListActivity" />
         <activity android:name=".UI.classManagement.AddStudentActivity" />
         <activity
             android:name=".UI.home"

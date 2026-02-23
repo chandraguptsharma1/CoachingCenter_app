@@ -2,13 +2,51 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2">
+    android:background="#114F98"
+    android:fitsSystemWindows="true"
+    android:paddingTop="?attr/actionBarSize">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="#33FFFFFF"
         android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:layout_marginBottom="10dp"
+        android:padding="16dp">
+        <!-- Page Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Student Info"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#111827"/>
+
+        <!-- Breadcrumb -->
+        <TextView
+            android:id="@+id/tvBreadcrumb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Dashboard  /  Class Management  /  Add Student"
+            android:textSize="12sp"
+            android:textColor="#6B7280"/>
+
+        <!-- top green line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="10dp"
+            android:background="#31B6A3"/>
+    </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -17,19 +55,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Create User"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="#111827"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_marginTop="10dp"
-                android:background="#31B6A3"/>
 
             <!-- Row 1 -->
             <LinearLayout

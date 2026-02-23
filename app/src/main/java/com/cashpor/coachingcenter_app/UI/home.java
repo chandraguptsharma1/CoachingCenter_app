@@ -12,9 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cashpor.coachingcenter_app.Adaptor.DashboardAdapter;
 import com.cashpor.coachingcenter_app.R;
 
+import com.cashpor.coachingcenter_app.UI.classManagement.BatchList;
+import com.cashpor.coachingcenter_app.UI.classManagement.StudentListActivity;
 import com.cashpor.coachingcenter_app.components.DashboardCard;
 import com.cashpor.coachingcenter_app.components.Legend;
 import com.google.android.material.navigation.NavigationView;
+import com.cashpor.coachingcenter_app.UI.TestList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,9 +77,11 @@ public class home extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_students) {
-                startActivity(new Intent(home.this, com.cashpor.coachingcenter_app.UI.StudentListActivity.class));
-            } else if (id == R.id.nav_dashboard) {
-                // already home/dashboard
+                startActivity(new Intent(home.this, StudentListActivity.class));
+            } else if(id == R.id.nav_batch){
+                startActivity(new Intent(home.this, BatchList.class));
+            } else if (id == R.id.nav_test) {
+                startActivity(new Intent(home.this, TestList.class));
             } else if (id == R.id.nav_paper_setting) {
 //                startActivity(new Intent(home.this, PaperSettingActivity.class)); // if you made it
             }

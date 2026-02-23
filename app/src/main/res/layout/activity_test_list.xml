@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:paddingTop="?attr/actionBarSize"
     android:layout_height="match_parent"
-    android:background="#114F98">
+    android:background="#114F98"
+    android:fitsSystemWindows="true"
+    android:paddingTop="?attr/actionBarSize">
 
-    <!-- Header Box -->
+    <!-- Header -->
     <LinearLayout
         android:id="@+id/headerBox"
         android:layout_width="0dp"
@@ -20,34 +20,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Page Title -->
         <TextView
-            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Student Info"
+            android:text="Users Info"
             android:textStyle="bold"
             android:textSize="18sp"
             android:textColor="#111827"/>
 
-        <!-- Breadcrumb -->
         <TextView
-            android:id="@+id/tvBreadcrumb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Dashboard  /  Class Management  /  Students"
+            android:text="Dashboard  /  Class Management  /  Test"
             android:textSize="12sp"
             android:textColor="#6B7280"/>
 
-        <!-- top green line -->
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:layout_marginTop="10dp"
             android:background="#31B6A3"/>
 
-        <!-- Actions Row -->
+        <!-- Actions -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,7 +54,7 @@
                 android:id="@+id/cbSelectAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select All Student"
+                android:text="Select All Test"
                 android:textSize="12sp"
                 android:textColor="#374151"
                 android:layout_marginEnd="10dp"/>
@@ -78,19 +73,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="10dp"
-                android:text="Add New Student"
+                android:text="+ Add New Test"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:backgroundTint="#17B890"
-                app:icon="@drawable/ic_add"
-                app:iconTint="@android:color/white"
-                app:iconPadding="8dp"
-                app:iconGravity="textStart" />
+                android:backgroundTint="#17B890"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Table Container -->
-    <!-- Table Container -->
+    <!-- Table Box -->
     <LinearLayout
         android:id="@+id/tableBox"
         android:layout_width="0dp"
@@ -103,35 +93,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Horizontal scroll for full table -->
-        <!-- Horizontal scroll for full table -->
+        <!-- Horizontal + Vertical scroll -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
             android:scrollbars="horizontal">
 
-            <!-- THIS must be wrap_content so weights can expand naturally -->
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:fillViewport="true"
+                android:scrollbars="vertical">
 
-                <!-- header here -->
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E5E7EB"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvStudents"
+                <TableLayout
+                    android:id="@+id/tlTests"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:overScrollMode="never"/>
-            </LinearLayout>
-
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="-1"
+                    android:shrinkColumns="-1"
+                    android:padding="8dp"/>
+            </androidx.core.widget.NestedScrollView>
         </HorizontalScrollView>
 
     </LinearLayout>
