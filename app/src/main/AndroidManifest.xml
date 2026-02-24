@@ -12,6 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CoachingCenter_app">
         <activity
+            android:name=".UI.TestSeries.CreateObjectivePaper"
+            android:exported="false" />
+        <activity
+            android:name=".UI.TestSeries.ManageObjectivePaper"
+            android:exported="false" />
+        <activity
+            android:name=".UI.TestSeries.CreateSetPaperDetails"
+            android:exported="false" />
+        <activity
+            android:name=".UI.TestSeries.ManageTestPaper"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.CreateSetPaper"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.SetPaperList"
+            android:exported="false" />
+        <activity
+            android:name=".UI.classManagement.FeeList"
+            android:exported="false" />
+        <activity
             android:name=".UI.classManagement.CreateLecture"
             android:exported="false" />
         <activity
