@@ -56,7 +56,7 @@ public class LectureList extends AppCompatActivity {
         list.add(new LectureModel(1, "Batch A", "MHSB", "English", "8th Std", "Science", "Ch-1", "Motion", "2025-11-08 05:52 AM"));
         list.add(new LectureModel(2, "Batch B", "MHSB", "Semi English", "10th Std", "Maths", "Ch-3", "Algebra", "2025-11-14 16:29 PM"));
 
-        btnAdd.setOnClickListener(v -> startActivity(new Intent(this, CreateLectureActivity.class)));
+//        btnAdd.setOnClickListener(v -> startActivity(new Intent(this, CreateLectureActivity.class)));
 
         btnDelete.setOnClickListener(v -> {
             int before = list.size();

@@ -21,11 +21,16 @@ import com.cashpor.coachingcenter_app.UI.TestList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import android.content.SharedPreferences;
+import android.view.View;
+import android.widget.TextView;
+
 
 public class home extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private TextView tvHello, tvRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,27 @@ public class home extends AppCompatActivity {
         rv.setLayoutManager(new GridLayoutManager(this, 2));
 
         ArrayList<DashboardCard> cards = new ArrayList<>();
+
+        tvHello = findViewById(R.id.tvHello);
+        tvRole = findViewById(R.id.tvRole);
+
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+
+        String name = prefs.getString("user_name", "User");
+        String role = prefs.getString("user_role", "");
+        String email = prefs.getString("user_email", "");
+
+        tvHello.setText("Hi, " + name);
+        tvRole.setText(role + " (" + email + ")");
+
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
+        TextView tvHeaderStatus = headerView.findViewById(R.id.tvHeaderStatus);
+
+        tvHeaderName.setText("Hi, " + name);
+        tvHeaderStatus.setText(role);
+
 
         cards.add(new DashboardCard("Lecture",
                 Arrays.asList(
