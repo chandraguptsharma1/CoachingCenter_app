@@ -1,9 +1,8 @@
 package com.cashpor.coachingcenter_app.UI;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -30,18 +29,21 @@ import retrofit2.Response;
 
 public class Login extends AppCompatActivity {
 
-    private static final String DUMMY_EMAIL = "admin@gmail.com";
-    private static final String DUMMY_PASS  = "123456";
-
     private TextInputLayout tilEmail, tilPassword;
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnSignIn;
-
     private View loadingOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ✅ session check before showing login
+        if (isUserLoggedIn()) {
+            openHomeAndFinish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
@@ -56,10 +58,22 @@ public class Login extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnSignIn = findViewById(R.id.btnSignIn);
-
         loadingOverlay = findViewById(R.id.loadingOverlay);
 
         btnSignIn.setOnClickListener(v -> doLogin());
+    }
+
+    private boolean isUserLoggedIn() {
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String token = prefs.getString("token", "");
+        boolean isLoggedIn = prefs.getBoolean("is_logged_in", false);
+
+        return isLoggedIn && !TextUtils.isEmpty(token);
+    }
+
+    private void openHomeAndFinish() {
+        startActivity(new Intent(Login.this, home.class));
+        finish();
     }
 
     private void showLoading(boolean show) {
@@ -73,9 +87,11 @@ public class Login extends AppCompatActivity {
     }
 
     private void doLogin() {
+        tilEmail.setError(null);
+        tilPassword.setError(null);
 
-        String email = etEmail.getText().toString().trim();
-        String pass = etPassword.getText().toString().trim();
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+        String pass = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
 
         if (TextUtils.isEmpty(email)) {
             tilEmail.setError("Email required");
@@ -90,58 +106,55 @@ public class Login extends AppCompatActivity {
         showLoading(true);
 
         LoginRequest request = new LoginRequest(email, pass, "");
-
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-
         Call<LoginResponse> call = apiService.loginUser(request);
 
-// 🔹 URL log
         Log.d("API_URL", call.request().url().toString());
 
         call.enqueue(new Callback<LoginResponse>() {
-
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-
                 showLoading(false);
 
                 Log.d("LOGIN_API", "Response Code: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
-
                     LoginResponse res = response.body();
 
                     Log.d("LOGIN_API", "Message: " + res.message);
                     Log.d("LOGIN_API", "Token: " + res.token);
+                    Log.d("LOGIN_API", "Success: " + res.success);
 
-                    if (res.status == 200) {
+                    if (res.success && res.user != null) {
 
                         getSharedPreferences("app_prefs", MODE_PRIVATE)
                                 .edit()
                                 .putString("token", res.token)
-                                .putString("user_id", res.user.id)
-                                .putString("user_name", res.user.name)
-                                .putString("user_email", res.user.email)
-                                .putString("user_role", res.user.role)
+                                .putInt("user_id", res.user.id)
+                                .putString("user_name", res.user.empName != null ? res.user.empName : "")
+                                .putString("user_email", res.user.email != null ? res.user.email : "")
+                                .putString("user_role", res.user.role != null ? res.user.role : "")
                                 .putInt("user_roleId", res.user.roleId)
+                                .putString("user_status", res.user.status != null ? res.user.status : "")
                                 .putBoolean("is_logged_in", true)
                                 .apply();
 
                         Toast.makeText(Login.this, "Login Success", Toast.LENGTH_SHORT).show();
-
-                        startActivity(new Intent(Login.this, home.class));
-                        finish();
+                        openHomeAndFinish();
 
                     } else {
-                        Toast.makeText(Login.this, res.message, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Login.this,
+                                res.message != null ? res.message : "Login failed",
+                                Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
-
                     Log.e("LOGIN_API", "Body null or response error");
 
                     try {
-                        Log.e("LOGIN_API_ERROR", response.errorBody().string());
+                        if (response.errorBody() != null) {
+                            Log.e("LOGIN_API_ERROR", response.errorBody().string());
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -152,9 +165,8 @@ public class Login extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-
                 showLoading(false);
-                Log.i("Server Error: ",t.getMessage());
+                Log.e("LOGIN_API", "Server Error: " + t.getMessage(), t);
                 Toast.makeText(Login.this, "Server Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

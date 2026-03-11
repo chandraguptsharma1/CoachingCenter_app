@@ -50,8 +50,8 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         h.tvBatch.setText(s.batch);
         h.tvBoard.setText(s.board);
         h.tvMedium.setText(s.medium);
-        h.tvClass.setText(s.sClass);
-        h.tvCreated.setText(s.created);
+        h.tvClass.setText(s.studentClass);
+        h.tvCreated.setText(s.createdAt);
 
         // ✅ checkbox (prevent unwanted triggers on recycle)
         h.cbRow.setOnCheckedChangeListener(null);

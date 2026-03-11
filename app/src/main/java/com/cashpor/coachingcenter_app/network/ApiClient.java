@@ -11,7 +11,7 @@ public class ApiClient {
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.2.16:5000") // change this
+                    .baseUrl("https://coachingcenter-backend.onrender.com") // change this
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
