@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -32,13 +33,12 @@ public class Login extends AppCompatActivity {
     private TextInputLayout tilEmail, tilPassword;
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnSignIn;
-    private View loadingOverlay;
+    private LinearLayout btnLoadingLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ session check before showing login
         if (isUserLoggedIn()) {
             openHomeAndFinish();
             return;
@@ -58,7 +58,7 @@ public class Login extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnSignIn = findViewById(R.id.btnSignIn);
-        loadingOverlay = findViewById(R.id.loadingOverlay);
+        btnLoadingLayout = findViewById(R.id.btnLoadingLayout);
 
         btnSignIn.setOnClickListener(v -> doLogin());
     }
@@ -67,7 +67,6 @@ public class Login extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         String token = prefs.getString("token", "");
         boolean isLoggedIn = prefs.getBoolean("is_logged_in", false);
-
         return isLoggedIn && !TextUtils.isEmpty(token);
     }
 
@@ -77,13 +76,15 @@ public class Login extends AppCompatActivity {
     }
 
     private void showLoading(boolean show) {
-        if (loadingOverlay != null) {
-            loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
-        }
-
         btnSignIn.setEnabled(!show);
-        btnSignIn.setAlpha(show ? 0.7f : 1f);
-        btnSignIn.setText(show ? "Signing in..." : "Sign in");
+        btnSignIn.setClickable(!show);
+        btnSignIn.setText(show ? "" : "Sign in");
+        btnSignIn.setAlpha(show ? 0.9f : 1f);
+
+        if (btnLoadingLayout != null) {
+            btnLoadingLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+            btnLoadingLayout.bringToFront();
+        }
     }
 
     private void doLogin() {
@@ -126,7 +127,6 @@ public class Login extends AppCompatActivity {
                     Log.d("LOGIN_API", "Success: " + res.success);
 
                     if (res.success && res.user != null) {
-
                         getSharedPreferences("app_prefs", MODE_PRIVATE)
                                 .edit()
                                 .putString("token", res.token)
@@ -141,16 +141,15 @@ public class Login extends AppCompatActivity {
 
                         Toast.makeText(Login.this, "Login Success", Toast.LENGTH_SHORT).show();
                         openHomeAndFinish();
-
                     } else {
-                        Toast.makeText(Login.this,
+                        Toast.makeText(
+                                Login.this,
                                 res.message != null ? res.message : "Login failed",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     }
 
                 } else {
-                    Log.e("LOGIN_API", "Body null or response error");
-
                     try {
                         if (response.errorBody() != null) {
                             Log.e("LOGIN_API_ERROR", response.errorBody().string());

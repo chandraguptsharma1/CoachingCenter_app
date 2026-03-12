@@ -1,5 +1,6 @@
 package com.cashpor.coachingcenter_app.UI.classManagement;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -46,6 +47,7 @@ public class StudentListActivity extends AppCompatActivity {
     private final int W_CLASS = 60;
     private final int W_CREATED = 120;
     private final int W_ACTION = 60;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,10 @@ public class StudentListActivity extends AppCompatActivity {
         cbSelectAll = findViewById(R.id.cbSelectAll);
         btnDelete = findViewById(R.id.btnDelete);
         btnAddNew = findViewById(R.id.btnAddNew);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading students...");
+        progressDialog.setCancelable(false);
 
         btnAddNew.setOnClickListener(v ->
                 startActivity(new Intent(StudentListActivity.this, AddStudentActivity.class))
@@ -90,6 +96,18 @@ public class StudentListActivity extends AppCompatActivity {
         loadStudentsFromApi();
     }
 
+    private void showLoading() {
+        if (progressDialog != null && !progressDialog.isShowing() && !isFinishing()) {
+            progressDialog.show();
+        }
+    }
+
+    private void hideLoading() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
     private void loadStudentsFromApi() {
         String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
                 .getString("token", "");
@@ -99,12 +117,16 @@ public class StudentListActivity extends AppCompatActivity {
             return;
         }
 
+        showLoading();
+
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<StudentListResponse> call = apiService.getStudents("Bearer " + token);
 
         call.enqueue(new Callback<StudentListResponse>() {
             @Override
             public void onResponse(Call<StudentListResponse> call, Response<StudentListResponse> response) {
+                hideLoading();
+
                 if (response.isSuccessful() && response.body() != null) {
                     StudentListResponse res = response.body();
 
@@ -123,7 +145,6 @@ public class StudentListActivity extends AppCompatActivity {
                                     formatDate(value(apiStudent.createdAt))
                             );
 
-                            // agar tumhare Student model me srNo field hai to set kar do
                             localStudent.srNo = srNo++;
                             students.add(localStudent);
                         }
@@ -146,6 +167,7 @@ public class StudentListActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<StudentListResponse> call, Throwable t) {
+                hideLoading();
                 Toast.makeText(StudentListActivity.this,
                         "API Failed: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
@@ -278,5 +300,11 @@ public class StudentListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadStudentsFromApi();
+    }
+
+    @Override
+    protected void onDestroy() {
+        hideLoading();
+        super.onDestroy();
     }
 }

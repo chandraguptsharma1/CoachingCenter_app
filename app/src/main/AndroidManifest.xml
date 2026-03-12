@@ -15,6 +15,10 @@
         <activity
             android:name=".UI.TestSeries.CreateObjectivePaper"
             android:exported="false" />
+        <activity android:name=".UI.classManagement.AttendanceListActivity" />
+        <activity
+            android:name=".UI.classManagement.AddAttendanceActivity"
+            android:exported="false" />
         <activity
             android:name=".UI.TestSeries.ManageObjectivePaper"
             android:exported="false" />

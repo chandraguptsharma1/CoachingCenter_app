@@ -1,5 +1,8 @@
 package com.cashpor.coachingcenter_app.network;
 
+import com.cashpor.coachingcenter_app.model.AddAttendanceRequest;
+import com.cashpor.coachingcenter_app.model.AddAttendanceResponse;
+import com.cashpor.coachingcenter_app.model.AttendanceListResponse;
 import com.cashpor.coachingcenter_app.network.model.AddStudentRequest;
 import com.cashpor.coachingcenter_app.network.model.CommonResponse;
 import com.cashpor.coachingcenter_app.network.model.LoginRequest;
@@ -26,5 +29,14 @@ public interface ApiService {
     @GET("/api/students")
     Call<StudentListResponse> getStudents(
             @Header("Authorization") String token
+    );
+
+    @GET("api/student-attendance/my")
+    Call<AttendanceListResponse> getMyAttendance(@Header("Authorization") String token);
+
+    @POST("/api/student-attendance")
+    Call<AddAttendanceResponse> addAttendance(
+            @Header("Authorization") String token,
+            @Body AddAttendanceRequest request
     );
 }
