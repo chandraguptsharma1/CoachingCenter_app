@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="10dp"
-                android:text="+ Add New Test"
+                android:text="+"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="#17B890"/>

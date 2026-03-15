@@ -1,24 +1,28 @@
 package com.cashpor.coachingcenter_app.UI.classManagement;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cashpor.coachingcenter_app.R;
-import com.cashpor.coachingcenter_app.model.Batch;
+import com.cashpor.coachingcenter_app.model.*;
+import com.cashpor.coachingcenter_app.network.ApiClient;
+import com.cashpor.coachingcenter_app.network.ApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BatchList extends AppCompatActivity {
 
@@ -29,17 +33,15 @@ public class BatchList extends AppCompatActivity {
     private final List<Batch> list = new ArrayList<>();
     private boolean updatingSelectAll = false;
 
-    private final int W_CB = 20;
-    private final int W_SR = 40;
-    private final int W_NAME = 80;
-    private final int W_BOARD = 80;
-    private final int W_MEDIUM = 80;
-    private final int W_CLASS = 30;
-    private final int W_CREATED = 80;
-    private final int W_ACTION = 50;
+    private ProgressDialog progressDialog;
+    private TextView tvNoData;
+    private List<Board> boards = new ArrayList<>();
+    private List<Medium> mediums = new ArrayList<>();
+    private List<ClassModel> classes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_batch_list);
 
@@ -48,38 +50,122 @@ public class BatchList extends AppCompatActivity {
         btnDelete = findViewById(R.id.btnDelete);
         btnAddNew = findViewById(R.id.btnAddNew);
 
-        // Dummy data
-        list.add(new Batch(1, "Batch A", "CBSE", "English", "10", "2026-02-11"));
-        list.add(new Batch(2, "Batch B", "ICSE", "Hindi", "9", "2026-02-07"));
-        list.add(new Batch(3, "Batch C", "CBSE", "English", "8", "2026-02-03"));
+        tvNoData = findViewById(R.id.tvNoData);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+
+        loadBatchList();
 
         btnAddNew.setOnClickListener(v -> openCreateBatchDialog());
 
         btnDelete.setOnClickListener(v -> {
-            int before = list.size();
-            for (Iterator<Batch> it = list.iterator(); it.hasNext();) {
-                if (it.next().selected) it.remove();
+
+            List<String> ids = new ArrayList<>();
+
+            for (Batch b : list) {
+                if (b.selected) {
+                    ids.add(b.batch_id);
+                }
             }
-            int removed = before - list.size();
-            if (removed == 0) {
-                Toast.makeText(this, "No batch selected", Toast.LENGTH_SHORT).show();
+
+            if (ids.isEmpty()) {
+
+                Toast.makeText(this,
+                        "No batch selected",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
-            Toast.makeText(this, "Deleted " + removed + " batch", Toast.LENGTH_SHORT).show();
-            renderTable();
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Batch")
+                    .setMessage("Are you sure you want to delete selected batch?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+
+                        for (String id : ids) {
+                            deleteBatch(id);
+                        }
+
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
         cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
             if (updatingSelectAll) return;
-            for (Batch b : list) b.selected = isChecked;
+
+            for (Batch b : list) {
+                b.selected = isChecked;
+            }
+
             renderTable();
         });
-
-        renderTable();
     }
 
+    // ========================
+    // LOAD BATCH LIST
+    // ========================
+
+    private void loadBatchList() {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Login again", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        showLoading();
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getBatches("Bearer " + token).enqueue(new Callback<BatchResponse>() {
+
+            @Override
+            public void onResponse(Call<BatchResponse> call, Response<BatchResponse> response) {
+
+                hideLoading();
+
+                if (response.body() == null || response.body().data == null) return;
+
+                list.clear();
+                list.addAll(response.body().data);
+
+                renderTable();
+            }
+
+            @Override
+            public void onFailure(Call<BatchResponse> call, Throwable t) {
+
+                hideLoading();
+                list.clear();
+                renderTable();
+                Toast.makeText(BatchList.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    // ========================
+    // TABLE
+    // ========================
+
     private void renderTable() {
+
         tlBatch.removeAllViews();
+
+        if (list == null || list.isEmpty()) {
+
+            tlBatch.setVisibility(View.GONE);
+            tvNoData.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        tlBatch.setVisibility(View.VISIBLE);
+        tvNoData.setVisibility(View.GONE);
+
         addHeaderRow();
 
         for (int i = 0; i < list.size(); i++) {
@@ -90,9 +176,12 @@ public class BatchList extends AppCompatActivity {
     }
 
     private void refreshHeaderUI() {
+
         int selectedCount = 0;
         boolean all = !list.isEmpty();
+
         for (Batch b : list) {
+
             if (b.selected) selectedCount++;
             else all = false;
         }
@@ -105,159 +194,405 @@ public class BatchList extends AppCompatActivity {
     }
 
     private void addHeaderRow() {
+
         TableRow tr = new TableRow(this);
 
-        // checkbox blank header
-        tr.addView(headerCell("", W_CB));
-        tr.addView(headerCell("SR.NO", W_SR));
-        tr.addView(headerCell("NAME", W_NAME));
-        tr.addView(headerCell("BOARD", W_BOARD));
-        tr.addView(headerCell("MEDIUM", W_MEDIUM));
-        tr.addView(headerCell("CLASS", W_CLASS));
-        tr.addView(headerCell("CREATED DATE", W_CREATED));
-        tr.addView(headerCell("ACTION", W_ACTION));
+        tr.addView(headerCell(""));
+        tr.addView(headerCell("SR.NO"));
+        tr.addView(headerCell("NAME"));
+        tr.addView(headerCell("BOARD"));
+        tr.addView(headerCell("MEDIUM"));
+        tr.addView(headerCell("CLASS"));
+        tr.addView(headerCell("CREATED"));
+        tr.addView(headerCell("ACTION"));
 
         tlBatch.addView(tr);
     }
 
     private void addDataRow(int index, Batch b) {
-        boolean alt = index % 2 != 0;
+
         TableRow tr = new TableRow(this);
 
-        tr.addView(cbCell(b.selected, W_CB, alt, b));
-        tr.addView(textCell(String.valueOf(b.srNo), W_SR, alt));
-        tr.addView(textCell(b.name, W_NAME, alt));
-        tr.addView(textCell(b.board, W_BOARD, alt));
-        tr.addView(textCell(b.medium, W_MEDIUM, alt));
-        tr.addView(textCell(b.sClass, W_CLASS, alt));
-        tr.addView(textCell(b.createdDate, W_CREATED, alt));
+        tr.addView(cbCell(b));
+        tr.addView(textCell(String.valueOf(index + 1)));
+        tr.addView(textCell(b.batch_name));
+        tr.addView(textCell(b.batch_id));
+        tr.addView(textCell(b.medium_id));
+        tr.addView(textCell(b.class_id));
+        tr.addView(textCell(b.created_on));
 
-        TextView action = textCell("E   D", W_ACTION, alt);
-        action.setOnClickListener(v ->
-                Toast.makeText(this, "Action: " + b.name, Toast.LENGTH_SHORT).show()
-        );
+        TextView action = textCell("Delete");
+
+        action.setTextColor(Color.RED);
+
+        action.setOnClickListener(v -> {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Batch")
+                    .setMessage("Delete this batch?")
+                    .setPositiveButton("Delete", (d, w) -> {
+                        deleteBatch(b.batch_id);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
         tr.addView(action);
 
         tlBatch.addView(tr);
     }
 
-    // ---------- cell helpers ----------
-    private TextView headerCell(String text, int minWidthDp) {
+    private TextView headerCell(String text) {
+
         TextView tv = new TextView(this);
         tv.setText(text);
-        tv.setTextSize(12);
-        tv.setTextColor(0xFF111827);
-        tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
-        tv.setPadding(dp(12), dp(12), dp(12), dp(12));
-        tv.setSingleLine(true);
-        tv.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        tv.setMinWidth(dp(minWidthDp));
+        tv.setPadding(20,20,20,20);
         tv.setBackgroundResource(R.drawable.bg_table_header);
+
         return tv;
     }
 
-    private TextView textCell(String text, int minWidthDp, boolean alt) {
+    private TextView textCell(String text) {
+
         TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextSize(12);
-        tv.setTextColor(0xFF111827);
-        tv.setPadding(dp(12), dp(10), dp(12), dp(10));
-        tv.setSingleLine(true);
-        tv.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        tv.setMinWidth(dp(minWidthDp));
-        tv.setBackgroundResource(alt ? R.drawable.bg_table_cell_alt : R.drawable.bg_table_cell);
+        tv.setText(text == null ? "" : text);
+        tv.setPadding(20,15,20,15);
+        tv.setBackgroundResource(R.drawable.bg_table_cell);
+
         return tv;
     }
 
-    private CheckBox cbCell(boolean checked, int minWidthDp, boolean alt, Batch b) {
+    private CheckBox cbCell(Batch b) {
+
         CheckBox cb = new CheckBox(this);
-        cb.setChecked(checked);
-        cb.setMinWidth(dp(minWidthDp));
-        cb.setPadding(dp(10), dp(10), dp(10), dp(10));
-        cb.setBackgroundResource(alt ? R.drawable.bg_table_cell_alt : R.drawable.bg_table_cell);
+
+        cb.setChecked(b.selected);
+
         cb.setOnCheckedChangeListener((btn, isChecked) -> {
+
             b.selected = isChecked;
             refreshHeaderUI();
         });
+
         return cb;
     }
 
-    private <T extends View> T wrapCell(T v) {
-        TableRow.LayoutParams lp = new TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT
-        );
-        v.setLayoutParams(lp);
-
-        // ✅ minimum width so columns don’t collapse
-        v.setMinimumWidth(dp(90)); // normal columns
-        v.setPadding(dp(12), dp(10), dp(12), dp(10));
-
-        v.setBackgroundResource(R.drawable.bg_table_cell);
-        return v;
-    }
-
-    private int dp(int value) {
-        return (int) (value * getResources().getDisplayMetrics().density);
-    }
+    // ========================
+    // CREATE BATCH
+    // ========================
 
     private void openCreateBatchDialog() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.dialog_create_batch, null);
-        builder.setView(view);
 
-        android.app.AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        View view = getLayoutInflater().inflate(R.layout.dialog_create_batch, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
         dialog.show();
 
-        TextView btnCloseX = view.findViewById(R.id.btnClose);
+        EditText etBatchName = view.findViewById(R.id.etBatchName);
+
+        Spinner spBoard = view.findViewById(R.id.spBoard);
+        Spinner spMedium = view.findViewById(R.id.spMedium);
+        Spinner spClass = view.findViewById(R.id.spClass);
+
+        MaterialButton btnSave = view.findViewById(R.id.btnAddBatch);
+
+        loadBoards(spBoard, spMedium, spClass);
+
         MaterialButton btnDialogClose = view.findViewById(R.id.btnDialogClose);
-        MaterialButton btnAddBatch = view.findViewById(R.id.btnAddBatch);
+        TextView btnClose = view.findViewById(R.id.btnClose);
 
-        android.widget.Spinner spBoard = view.findViewById(R.id.spBoard);
-        android.widget.Spinner spMedium = view.findViewById(R.id.spMedium);
-        android.widget.Spinner spClass = view.findViewById(R.id.spClass);
-        android.widget.EditText etBatchName = view.findViewById(R.id.etBatchName);
+        // ❌ Close button
+        btnDialogClose.setOnClickListener(v -> dialog.dismiss());
 
-        // ✅ Dummy dropdown data (later API se aayega)
-        setSpinner(spBoard, new String[]{"--- Select Board ---", "CBSE", "ICSE", "State"});
-        setSpinner(spMedium, new String[]{"--- Select Medium ---", "English", "Hindi"});
-        setSpinner(spClass, new String[]{"--- Select Class ---", "8", "9", "10", "11", "12"});
+        // ❌ Cross icon
+        btnClose.setOnClickListener(v -> dialog.dismiss());
 
-        View.OnClickListener close = v -> dialog.dismiss();
-        btnCloseX.setOnClickListener(close);
-        btnDialogClose.setOnClickListener(close);
 
-        btnAddBatch.setOnClickListener(v -> {
-            String board = spBoard.getSelectedItem().toString();
-            String medium = spMedium.getSelectedItem().toString();
-            String cls = spClass.getSelectedItem().toString();
+        btnSave.setOnClickListener(v -> {
+
             String batchName = etBatchName.getText().toString().trim();
 
-            if (board.startsWith("---") || medium.startsWith("---") || cls.startsWith("---")) {
-                Toast.makeText(this, "Please select Board/Medium/Class", Toast.LENGTH_SHORT).show();
-                return;
-            }
             if (batchName.isEmpty()) {
-                etBatchName.setError("Enter Batch Name");
-                etBatchName.requestFocus();
+                Toast.makeText(this, "Enter batch name", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // ✅ Add into list (later API call)
-            int sr = list.size() + 1;
-            list.add(new com.cashpor.coachingcenter_app.model.Batch(sr, batchName, board, medium, cls, "2026-02-23"));
+            int boardPos = spBoard.getSelectedItemPosition();
+            int mediumPos = spMedium.getSelectedItemPosition();
+            int classPos = spClass.getSelectedItemPosition();
+
+            if (boardPos == 0 || mediumPos == 0 || classPos == 0) {
+                Toast.makeText(this, "Select Board, Medium and Class", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String boardId = boards.get(boardPos - 1).board_id;
+            String mediumId = mediums.get(mediumPos - 1).medium_id;
+            String classId = classes.get(classPos - 1).class_id;
+
+            createBatch(batchName, boardId, mediumId, classId);
 
             dialog.dismiss();
-            renderTable(); // refresh table
-            Toast.makeText(this, "Batch added: " + batchName, Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void setSpinner(android.widget.Spinner sp, String[] items) {
-        android.widget.ArrayAdapter<String> ad =
-                new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        sp.setAdapter(ad);
+    private void createBatch(String batchName, String boardId, String mediumId, String classId) {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        AddBatchRequest request = new AddBatchRequest();
+        request.batch_name = batchName;
+        request.board_id = boardId;
+        request.medium_id = mediumId;
+        request.class_id = classId;
+        request.branch_id = null;
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        showLoading();
+
+        api.addBatch("Bearer " + token, request)
+                .enqueue(new Callback<GenericResponse>() {
+
+                    @Override
+                    public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+
+                        hideLoading();
+
+                        if (response.body() != null && response.body().success) {
+
+                            Toast.makeText(BatchList.this,
+                                    "Batch Created Successfully",
+                                    Toast.LENGTH_LONG).show();
+
+                            loadBatchList(); // refresh table
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<GenericResponse> call, Throwable t) {
+
+                        hideLoading();
+
+                        Toast.makeText(BatchList.this,
+                                "Failed : " + t.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    // ========================
+    // BOARD
+    // ========================
+
+    private void loadBoards(Spinner spBoard, Spinner spMedium, Spinner spClass) {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getBoards("Bearer " + token).enqueue(new Callback<BoardResponse>() {
+
+            @Override
+            public void onResponse(Call<BoardResponse> call, Response<BoardResponse> response) {
+
+                if (response.body() == null || response.body().data == null) return;
+
+                boards = response.body().data;
+
+                List<String> names = new ArrayList<>();
+                names.add("Select Board");
+
+                for (Board b : boards) {
+                    names.add(b.board_name == null ? "Unknown Board" : b.board_name);
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        BatchList.this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        names
+                );
+
+                spBoard.setAdapter(adapter);
+
+                spBoard.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        if (position == 0) return;
+
+                        String boardId = boards.get(position - 1).board_id;
+
+                        loadMediums(boardId, spMedium, spClass);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
+                });
+            }
+
+            @Override
+            public void onFailure(Call<BoardResponse> call, Throwable t) {}
+        });
+    }
+
+    // ========================
+    // MEDIUM
+    // ========================
+
+    private void loadMediums(String boardId, Spinner spMedium, Spinner spClass) {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getMediums("Bearer " + token, boardId)
+                .enqueue(new Callback<MediumResponse>() {
+
+                    @Override
+                    public void onResponse(Call<MediumResponse> call, Response<MediumResponse> response) {
+
+                        if (response.body() == null || response.body().data == null) return;
+
+                        mediums = response.body().data;
+
+                        List<String> names = new ArrayList<>();
+                        names.add("Select Medium");
+
+                        for (Medium m : mediums) {
+
+                            if (m.medium != null) {
+                                names.add(m.medium);
+                            } else {
+                                names.add("Unknown Medium");
+                            }
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                BatchList.this,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                names
+                        );
+
+                        spMedium.setAdapter(adapter);
+
+                        spMedium.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                                if (position == 0) return;
+
+                                String mediumId = mediums.get(position - 1).medium_id;
+
+                                loadClasses(boardId, mediumId, spClass);
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {}
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<MediumResponse> call, Throwable t) {
+
+                        Toast.makeText(BatchList.this, "Failed to load mediums", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // ========================
+    // CLASS
+    // ========================
+
+    private void deleteBatch(String batchId) {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        showLoading();
+
+        api.deleteBatch("Bearer " + token, batchId)
+                .enqueue(new Callback<GenericResponse>() {
+
+                    @Override
+                    public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+
+                        hideLoading();
+
+                        if (response.body() != null && response.body().success) {
+
+                            Toast.makeText(BatchList.this,
+                                    "Batch Deleted",
+                                    Toast.LENGTH_SHORT).show();
+
+                            loadBatchList(); // refresh list
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<GenericResponse> call, Throwable t) {
+
+                        hideLoading();
+
+                        Toast.makeText(BatchList.this,
+                                "Delete Failed",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+    private void loadClasses(String boardId, String mediumId, Spinner spClass) {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getClasses("Bearer " + token, boardId, mediumId)
+                .enqueue(new Callback<ClassResponse>() {
+
+                    @Override
+                    public void onResponse(Call<ClassResponse> call, Response<ClassResponse> response) {
+
+                        if (response.body() == null || response.body().data == null) return;
+
+                        classes = response.body().data;
+
+                        List<String> names = new ArrayList<>();
+                        names.add("Select Class");
+
+                        for (ClassModel c : classes) {
+                            names.add(c.class_name == null ? "Unknown Class" : c.class_name);
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                BatchList.this,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                names
+                        );
+
+                        spClass.setAdapter(adapter);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ClassResponse> call, Throwable t) {}
+                });
+    }
+
+    private void showLoading() {
+        if (!progressDialog.isShowing()) progressDialog.show();
+    }
+
+    private void hideLoading() {
+        if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 }

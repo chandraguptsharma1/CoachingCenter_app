@@ -1,4 +1,4 @@
-package com.cashpor.coachingcenter_app.UI;
+package com.cashpor.coachingcenter_app.UI.classManagement;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,12 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.cashpor.coachingcenter_app.R;
 import com.cashpor.coachingcenter_app.UI.classManagement.CreateTest;
 import com.cashpor.coachingcenter_app.model.TestModel;
+import com.cashpor.coachingcenter_app.model.TestResponse;
+import com.cashpor.coachingcenter_app.network.ApiClient;
+import com.cashpor.coachingcenter_app.network.ApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TestList extends AppCompatActivity {
 
@@ -55,9 +62,7 @@ public class TestList extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAddNew);
 
         // dummy table data
-        list.add(new TestModel(1, "Subjective", "25", "09 Nov 2025 01:30 AM", "History & Civics", "MHSB", "English", "8th Std", "2025-11-08 05:52 AM"));
-        list.add(new TestModel(2, "Subjective", "80", "15 Nov 2025 08:59 PM", "English", "MHSB", "Semi English", "10th Std", "2025-11-14 16:29 PM"));
-        list.add(new TestModel(3, "Subjective", "40", "17 Nov 2025 05:00 PM", "History", "MHSB", "English", "10th Std", "2025-11-15 14:16 PM"));
+        loadTests();
 
         btnAdd.setOnClickListener(v -> startActivity(new Intent(this, CreateTest.class)));
 
@@ -140,15 +145,15 @@ public class TestList extends AppCompatActivity {
         });
         tr.addView(cb);
 
-        tr.addView(textCell(String.valueOf(t.srNo), W_SR, alt));
-        tr.addView(textCell(t.testType, W_TYPE, alt));
+        tr.addView(textCell(String.valueOf(index + 1), W_SR, alt));
+        tr.addView(textCell(t.test_type, W_TYPE, alt));
         tr.addView(textCell(t.marks, W_MARKS, alt));
-        tr.addView(textCell(t.dateTime, W_DT, alt));
+        tr.addView(textCell(t.date_time, W_DT, alt));
         tr.addView(textCell(t.subject, W_SUB, alt));
         tr.addView(textCell(t.board, W_BOARD, alt));
         tr.addView(textCell(t.medium, W_MED, alt));
-        tr.addView(textCell(t.sClass, W_CLASS, alt));
-        tr.addView(textCell(t.createdDate, W_CREATED, alt));
+        tr.addView(textCell(t.class_name, W_CLASS, alt));
+        tr.addView(textCell(t.created_on, W_CREATED, alt));
 
         TextView action = textCell("🗑", W_ACTION, alt);
         action.setGravity(Gravity.CENTER);
@@ -191,6 +196,40 @@ public class TestList extends AppCompatActivity {
         tv.setMinWidth(dp(minWidthDp));
         tv.setBackgroundResource(alt ? R.drawable.bg_table_cell_alt : R.drawable.bg_table_cell);
         return tv;
+    }
+
+    private void loadTests() {
+
+        String token = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("token", "");
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getTests("Bearer " + token)
+                .enqueue(new Callback<TestResponse>() {
+
+                    @Override
+                    public void onResponse(Call<TestResponse> call, Response<TestResponse> response) {
+
+                        if (response.body() == null || response.body().data == null) {
+                            Toast.makeText(TestList.this,"No data",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        list.clear();
+                        list.addAll(response.body().data);
+
+                        renderTable();
+                    }
+
+                    @Override
+                    public void onFailure(Call<TestResponse> call, Throwable t) {
+
+                        Toast.makeText(TestList.this,
+                                "Failed : " + t.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private int dp(int v) {

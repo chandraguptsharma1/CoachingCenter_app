@@ -58,8 +58,8 @@
             android:name=".UI.classManagement.CreateTest"
             android:exported="false" />
         <activity
-            android:name=".UI.TestList"
-            android:exported="false" />
+            android:name=".UI.classManagement.TestList"
+            android:exported="false"/>
         <activity
             android:name=".UI.classManagement.BatchList"
             android:exported="false" />

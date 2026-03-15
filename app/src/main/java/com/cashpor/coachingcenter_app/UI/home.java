@@ -28,6 +28,7 @@ import com.cashpor.coachingcenter_app.UI.classManagement.AttendanceListActivity;
 import com.cashpor.coachingcenter_app.UI.classManagement.BatchList;
 import com.cashpor.coachingcenter_app.UI.classManagement.StudentListActivity;
 
+import com.cashpor.coachingcenter_app.UI.classManagement.TestList;
 import com.cashpor.coachingcenter_app.components.DashboardCard;
 import com.cashpor.coachingcenter_app.components.Legend;
 import com.cashpor.coachingcenter_app.helper.AppUpdateHelper;
@@ -159,7 +160,7 @@ public class home extends AppCompatActivity {
             } else if (id == R.id.nav_attendance) {
                 startActivity(new Intent(home.this, AttendanceListActivity.class));
             } else if (id == R.id.nav_test) {
-                // startActivity(new Intent(home.this, TestList.class));
+                 startActivity(new Intent(home.this, TestList.class));
             } else if (id == R.id.nav_paper_setting) {
                 // startActivity(new Intent(home.this, PaperSettingActivity.class));
             }else if (id == R.id.nav_logout) {
